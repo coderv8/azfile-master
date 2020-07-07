@@ -48,8 +48,7 @@ namespace azfile
                                 {
                                     data.Value.CopyTo(mStream);
                                     dataArray = mStream.ToArray();
-                                    //string b64String = Convert.ToBase64String(dataArray);
-
+                                   
                                     FileShareOperations.UploadtoFileShare("myfiles", dataArray, file.Name);
                                 }
                             }
