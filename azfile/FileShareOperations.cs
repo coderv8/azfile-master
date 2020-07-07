@@ -33,7 +33,7 @@ namespace azfile
                 CloudFile cloudFile = rootDir.GetFileReference(fileName);
 
 
-                FileStream fStream = File.OpenRead("C:\\myprojs\\images\\krishna.jpg");
+               // FileStream fStream = File.OpenRead("C:\\myprojs\\images\\krishna.jpg");
 
 
 

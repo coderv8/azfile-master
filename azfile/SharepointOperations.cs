@@ -13,40 +13,45 @@ namespace azfile
     {
         public static void getFileStream()
         {
+          
+           // var filterDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
             List list = Helper.SPClientContext.Web.Lists.GetByTitle("MyLib");
-            Helper.SPClientContext.Load(list);
+           // CamlQuery cml = new CamlQuery();
+           // cml.ViewXml = "<View><Query><Where><eq><FieldRef Name='Modified'/><Value Type='DateTime' IncludeTimeValue='TRUE'>" + filterDate + "</Value></eq></Where>><OrderBy><FieldRef Name='Modified' Ascending = 'true' /></OrderBy></Query></View>";
+            // Helper.SPClientContext.Load(list);
+           // list.GetItems(cml);
             Helper.SPClientContext.Load(list.RootFolder);
             Helper.SPClientContext.Load(list.RootFolder.Folders);
-            Helper.SPClientContext.Load(list.RootFolder.Files);
+           // Helper.SPClientContext.Load(list.RootFolder.Files);
             Helper.SPClientContext.ExecuteQuery();
             FolderCollection fcol = list.RootFolder.Folders;
-            List<string> lstFile = new List<string>();
+            
             byte[] dataArray;
             foreach (Folder f in fcol)
             {
                 if (f.Name == "myfolder")
                 {
-                    Helper.SPClientContext.Load(f);
                     Helper.SPClientContext.Load(f.Files);
                     Helper.SPClientContext.ExecuteQuery();
                     FileCollection fileCol = f.Files;
                     foreach (Microsoft.SharePoint.Client.File file in fileCol)
                     {
-                        Helper.SPClientContext.Load(file);
-                        Helper.SPClientContext.ExecuteQuery();
-                        ClientResult<System.IO.Stream> data = file.OpenBinaryStream();
-                        Helper.SPClientContext.Load(file);
-                        Helper.SPClientContext.ExecuteQuery();
-
-                        using (System.IO.MemoryStream mStream = new System.IO.MemoryStream())
+                        if (file.TimeLastModified >= DateTime.Now.AddDays(-7))
                         {
-                            if (data != null)
-                            {
-                                data.Value.CopyTo(mStream);
-                                dataArray = mStream.ToArray();
-                                string b64String = Convert.ToBase64String(dataArray);
+                            ClientResult<System.IO.Stream> data = file.OpenBinaryStream();
+                            Helper.SPClientContext.Load(file);
+                            Helper.SPClientContext.ExecuteQuery();
 
-                                FileShareOperations.UploadtoFileShare("myfiles", dataArray, file.Name);
+                            using (System.IO.MemoryStream mStream = new System.IO.MemoryStream())
+                            {
+                                if (data != null)
+                                {
+                                    data.Value.CopyTo(mStream);
+                                    dataArray = mStream.ToArray();
+                                    //string b64String = Convert.ToBase64String(dataArray);
+
+                                    FileShareOperations.UploadtoFileShare("myfiles", dataArray, file.Name);
+                                }
                             }
                         }
                     }
